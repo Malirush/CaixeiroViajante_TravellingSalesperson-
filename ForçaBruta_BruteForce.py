@@ -1,10 +1,4 @@
-'''
-calculo distancias:
 
-
-
-
-'''
 
 import random as rd
 import math
