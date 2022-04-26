@@ -67,7 +67,6 @@ def custo(scan):
                 abs(valor_2[0]-valor_saida[0])
         dis_total = sum(distancias.values())+dist_retorno
 
-        # print(f'{dis_total}')
         all_dist.append(dis_total)
         perc_dist.update({f'{percurso}': dis_total})
         percurso.clear()
