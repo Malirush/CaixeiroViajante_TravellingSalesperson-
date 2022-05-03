@@ -5,21 +5,16 @@
 
 
 
-import copy
+
+
 import random as rd
 
 
 def scan(tabela):
     matriz = list(open(tabela, 'r'))
-
     matriz = [s.rstrip() for s in matriz]
-    print(matriz)
-    print(len(matriz))
     lista = [_str.split(' ') for _str in matriz]
-
     lista.remove(lista[0])
-    print(lista)
-
     x = len(lista)
     global scaneadas
     scaneadas = {}
@@ -48,6 +43,20 @@ def curso(scaner):
     mtz = 'R'
     global all_dists
     all_dists = []
+    global TopResultscromo
+    try:
+        qtdTop = len(TopResultscromo)
+
+    except NameError:
+        TopResultscromo = []
+
+    global TopResultsdist
+    try:
+        qtdTopdist = len(TopResultsdist)
+
+    except NameError:
+        TopResultsdist = []
+
     tp = 8
     grdr = 0
     vfs = []
@@ -102,15 +111,29 @@ def curso(scaner):
             all_dists.append(dTotal)
             vfs.append(1/dTotal)
             cromo_dist.update({str(cromossv): dTotal})
-        if len(cromo_dist) != 8:
+        if len(cromo_dist) != 8 or len(cromos) != 8:
             cromos.clear()
+            try:
+                cromos.append(filho1)
+                cromos.append(filho2)
+                grdr += 2
+            except:
+                pass
             cromo_dist.clear()
             all_dists.clear()
             grdr = 0
             gerascount = 0
             continue
 
-        pass
+        bestindex = (all_dists.index(min(all_dists)))
+        TopResultsdist.append(min(all_dists))
+        TopResultscromo.append(cromos[bestindex])
+        if len(TopResultscromo) == 10:
+            bestindex = TopResultsdist.index(min(TopResultsdist))
+            distfinal = TopResultsdist[bestindex]
+            final = TopResultscromo[bestindex]
+            final = ','.join(final)
+            return print(f'Melhor caminho:{final} Distancia: {distfinal}')
 
     return genetico(cromos, all_dists)
 
@@ -120,7 +143,7 @@ def genetico(cromos, dists):
     vfs = [1/x for x in dists]
     vfsTotal = []
     pc = 0.95  # prbabilidade de cruzamento
-    pm = 0.91  # prbabilidade de mutacao
+    pm = 0.01  # prbabilidade de mutacao
     global tc
     tc = 4  # tamanho do cromossomo
     # criacao da roleta
@@ -173,7 +196,9 @@ def genetico(cromos, dists):
                     crz -= 1
                     continue
                 else:
+                    global filho1
                     filho1 = cromos[pai1]
+                    global filho2
                     filho2 = cromos[pai2]
                     selecao = False
                     break
@@ -187,17 +212,36 @@ def genetico(cromos, dists):
         return mutacao(filho1, filho2)
 
     else:
-        return
+        cromos.clear()
+        cromos.append(filho1), cromos.append(filho2)
+        global Mutcount
+        Mutcount += 2
+        curso(scaneadas)
 
 
 def mutacao(filho1, filho2):
+    mut = True
+    while mut:
+        idx = rd.randint(0, 3)
+        if idx < 3:
+            idx2 = idx+1
+        elif idx > 0:
+            idx2 = idx-1
+        filho1[idx], filho2[idx] = filho2[idx], filho1[idx]
+        filho1[idx2], filho2[idx2] = filho2[idx2], filho1[idx2]
+        filho1test = set(filho1)
+        filho2test = set(filho2)
+        if len(filho1test) < tc or len(filho2test) < tc:
+            filho1[idx], filho2[idx] = filho2[idx], filho1[idx]
+            continue
+        else:
+            break
     cromos.clear()
     cromos.append(filho1), cromos.append(filho2)
     global Mutcount
     Mutcount += 2
-    curso(scaneadas)
 
-    print('rola')
+    curso(scaneadas)
 
 
 print(scan(r'C:\python\PSIS\flyfood\tabela.txt'))
